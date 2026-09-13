@@ -1,6 +1,6 @@
-# Google Cloud + OAuth setup (owner, ~30 min, $0)
+# Google Cloud + OAuth setup (owner, ~20 min, $0)
 
-Do these once the domain appreviewreply.app is live with index.html and privacy.html.
+No domain needed for the beta. When adding the `androidpublisher` scope in step B, note whether the console labels it sensitive/restricted — that decides whether a domain is needed later for verification.
 
 ## A. Cloud project and API
 1. https://console.cloud.google.com → New project: **AppReviewReply**.
@@ -10,9 +10,7 @@ Do these once the domain appreviewreply.app is live with index.html and privacy.
 - App name: `AppReviewReply` (no "Google", "Play", "Play Store" in the name).
 - User support email: hello@appreviewreply.app (or your Gmail for now).
 - App logo: 120×120 PNG of the app icon (assets/icon.png — AI will generate).
-- App home page: https://appreviewreply.app/
-- Privacy policy: https://appreviewreply.app/privacy.html
-- Authorized domain: `appreviewreply.app` (verify it in Search Console first: https://search.google.com/search-console → add property → DNS TXT record at your registrar).
+- App home page / privacy policy / authorized domain: leave empty for Testing mode. Fill in (site/ pages on appreviewreply.app) only when submitting for verification.
 - Audience: **External**, publishing status **Testing**. Add test users: your Gmail + up to 100 beta testers' Gmails.
 - Data access / scopes: add `https://www.googleapis.com/auth/androidpublisher`.
 - Submit for verification only after 5–10 beta users are happy (verification unlocks >100 users and removes the "unverified app" warning).

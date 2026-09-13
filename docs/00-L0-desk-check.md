@@ -8,10 +8,12 @@ Product name: **AppReviewReply** — domain appreviewreply.app, package `app.app
 - Auth: **OAuth user consent works** — the developer signs in with their own Google account; what they can do is limited by their Play Console user permissions (needs "Reply to reviews"). Service-account setup (AppFollow style, 10-minute chore) is NOT required. Linking a Cloud project to the Play account is no longer required.
 - Google's official Play Console app lets you reply manually; no drafting help.
 
-## OAuth verification (the real friction)
-- Every app using Google APIs needs **brand verification**: a homepage on a **domain you own** (verified in Search Console), a privacy policy hosted on that domain, consent-screen branding. `github.io` cannot be an authorized domain → **this idea needs a domain (~$10/yr)**. Owner approval required per strategy §8.
-- Until verified (typically days to a few weeks), the OAuth client runs in **Testing mode: up to 100 named test users**, with an "unverified app" warning. That is enough for a closed beta and first payments.
-- Whether `androidpublisher` counts as a *sensitive* scope (extra review) could not be confirmed from the scopes page (truncated); assume yes and plan for a short review.
+## OAuth verification — corrected 2026-09-13
+- Google Sign-In itself needs **no domain and no verification** (email/profile/openid scopes). Android apps only need an OAuth Android client (package + SHA-1).
+- Verification (and with it: a homepage + privacy policy on a domain you own, verified in Search Console) is required only for **sensitive/restricted scopes** when publishing to production. Sources: support.google.com/cloud/answer/7454865, /answer/9110914, developers.google.com/.../sensitive-scope-verification.
+- Our scope `androidpublisher`: Google's docs do not list its classification; the Cloud Console shows it when the scope is added to the consent screen. **Check there before buying a domain.**
+- Either way, **Testing mode** (up to 100 named test users) works without verification or a domain → the beta needs no domain.
+- Decision: domain deferred until (a) the console marks the scope sensitive AND (b) we want to leave Testing mode. Landing/privacy pages are written and ready in site/ for that day.
 
 ## Competitors and prices (verified)
 | Tool | Price | AI reply / auto-reply | Built for |
