@@ -10,3 +10,6 @@
 - First debug build succeeded (app-debug.apk, 22.6 MB) after lowering Gradle heap to 2 GB (16 GB Mac ran out of memory with 4 GB heap + parallel).
 - Emulator smoke test (Pixel 3a, API 33): installs, launches, sign-in screen renders, sign-in tap calls Google Authorization API without crashing (this image lacks the service; real test needs a device + OAuth client). Screenshots in assets/screenshots/.
 - Next: owner buys domain + creates GitHub repo + Cloudflare/Anthropic/Google Cloud setup (docs/02-google-setup.md); then real-device test with owner's own Play apps.
+- Added: demo mode (sample reviews, simulated posting), Play Billing scaffold (SUBSCRIPTION_REQUIRED=false during beta), notification permission prompt, unit tests (API parsing, merge), release signing via ~/.appreviewreply upload key, docs 04-release + 05-play-listing, feature graphic.
+- GitHub: github.com/AHAariyan/appreviewreply (main + gh-pages site) and github.com/AHAariyan/indiestudio (private) created and pushed.
+- Not possible without owner: proxy deploy/live test (no Anthropic key on this Mac), Google Cloud OAuth client, Play Console upload, real-device end-to-end test.
