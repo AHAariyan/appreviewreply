@@ -54,7 +54,7 @@ class DraftClient(
             .url("${BuildConfig.PROXY_URL.trimEnd('/')}/draft")
             .header("X-App-Secret", BuildConfig.APP_SECRET)
             .header("X-User-Id", userId)
-            .apply { if (!byoKey.isNullOrBlank()) header("X-Anthropic-Key", byoKey) }
+            .apply { if (!byoKey.isNullOrBlank()) header("X-Api-Key", byoKey) }
             .post(payload.toRequestBody("application/json".toMediaType()))
             .build()
 

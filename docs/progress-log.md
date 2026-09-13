@@ -15,3 +15,6 @@
 - Not possible without owner: proxy deploy/live test (no Anthropic key on this Mac), Google Cloud OAuth client, Play Console upload, real-device end-to-end test.
 - Screenshots of all screens captured in demo mode (assets/screenshots/); chip-wrapping bug in inbox cards fixed; screenshots added to the website.
 - Deliverables ready for owner: signed app-release.aab, debug APK, website live at https://ahaariyan.github.io/appreviewreply/, listing copy, feature graphic.
+- Proxy switched to a provider switch (OpenAI default, gpt-4o-mini; Anthropic kept behind PROVIDER=anthropic). Verified live with the owner's OpenAI key via a Node harness: auth, validation, EN crash → crash/needs_followup, ES praise → Spanish reply, KV counter. ~$0.0001 per draft.
+- Secrets: OpenAI key + generated APP_SECRET stored in macOS Keychain (services appreviewreply-openai-api-key, appreviewreply-app-secret) and proxy/.dev.vars (git-ignored). Owner should rotate the key after deploy (it was pasted in chat).
+- Wrangler 4 needs Node 22; installing node@22 via Homebrew (keg-only).

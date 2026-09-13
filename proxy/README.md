@@ -6,7 +6,7 @@ Holds the Anthropic API key, drafts a Play Store review reply + classification, 
 1. Create a Cloudflare account, install: `npm i -g wrangler` and `wrangler login`.
 2. `cd proxy && npm install`
 3. `wrangler kv namespace create LIMITS` → paste the id into `wrangler.toml`.
-4. `wrangler secret put ANTHROPIC_API_KEY` (from console.anthropic.com)
+4. `wrangler secret put OPENAI_API_KEY` (or `ANTHROPIC_API_KEY` with `PROVIDER = "anthropic"` in wrangler.toml)
    `wrangler secret put APP_SECRET` (any long random string; the Android app sends it as `X-App-Secret`)
 5. `npm run deploy` → URL like `https://appreviewreply-proxy.<account>.workers.dev`
 
@@ -20,8 +20,8 @@ curl -s https://appreviewreply-proxy.<account>.workers.dev/draft \
 Expected: `{ "reply": "...", "category": "crash", "summary": "...", "needs_followup": true, "language": "en", "usage": {...} }`
 
 ## Notes
-- Model: `claude-opus-5` with server-side refusal fallback to `claude-opus-4-8` (configured in `wrangler.toml`).
-- Structured output via `output_config.format` (Zod schema) → the reply is always valid JSON.
-- The stable system prompt is cached (`cache_control`), so repeated drafts are cheaper.
-- `X-Anthropic-Key` header = bring-your-own key: bypasses the cap, billed to the user.
+- Provider switch: `PROVIDER = "openai"` (default, model `gpt-4o-mini`) or `"anthropic"` (`claude-opus-5` with refusal fallback). Same JSON contract either way.
+- Structured output enforced by the provider (OpenAI json_schema strict / Anthropic output_config) → the reply is always valid JSON.
+- `X-Api-Key` header = bring-your-own key for the configured provider: bypasses the cap, billed to the user.
+- Local test: put `OPENAI_API_KEY=...` and `APP_SECRET=...` in `.dev.vars` (git-ignored), run `npx wrangler dev`, curl `http://localhost:8787/draft`.
 - Beta-grade auth (shared secret). Before public launch: Play Integrity API token verification.

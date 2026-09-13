@@ -3,13 +3,15 @@ main = "src/index.ts"
 compatibility_date = "2025-09-01"
 compatibility_flags = ["nodejs_compat"]
 
-# Secrets (set with `wrangler secret put NAME`):
-#   ANTHROPIC_API_KEY  - the studio's Anthropic key
+# Secrets (set with `wrangler secret put NAME`; locally in .dev.vars):
+#   OPENAI_API_KEY     - when PROVIDER = "openai" (default)
+#   ANTHROPIC_API_KEY  - when PROVIDER = "anthropic"
 #   APP_SECRET         - shared secret embedded in the Android app (beta-grade; replace with Play Integrity later)
 
 [vars]
-MODEL = "claude-opus-5"
-FALLBACK_MODEL = "claude-opus-4-8"
+PROVIDER = "openai"
+MODEL = "gpt-4o-mini"
+# For PROVIDER = "anthropic": MODEL = "claude-opus-5", FALLBACK_MODEL = "claude-opus-4-8"
 MONTHLY_CAP = "500"
 MAX_REPLY_CHARS = "350"
 

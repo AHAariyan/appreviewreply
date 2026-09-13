@@ -46,8 +46,8 @@ fun SettingsScreen(vm: AppViewModel, onAddApp: () -> Unit) {
             OutlinedButton(onClick = onAddApp, modifier = Modifier.fillMaxWidth()) { Text("Add another app") }
 
             Text("AI drafts", style = MaterialTheme.typography.titleMedium)
-            Text("Included: 500 drafts per month. Add your own Anthropic API key for unlimited drafts billed to you.", style = MaterialTheme.typography.bodySmall)
-            OutlinedTextField(value = byo, onValueChange = { byo = it }, label = { Text("Anthropic API key (optional)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+            Text("Included: 500 drafts per month. Add your own OpenAI API key for unlimited drafts billed to you.", style = MaterialTheme.typography.bodySmall)
+            OutlinedTextField(value = byo, onValueChange = { byo = it }, label = { Text("OpenAI API key (optional)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
             Row { Button(onClick = { vm.setByoKey(byo) }) { Text("Save key") }; Spacer(Modifier.padding(4.dp)); if (byo.isNotBlank()) TextButton(onClick = { byo = ""; vm.setByoKey("") }) { Text("Remove") } }
 
             val subscribed by vm.billing.subscribed.collectAsStateWithLifecycle()

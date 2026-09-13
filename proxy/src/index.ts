@@ -3,21 +3,25 @@
  *
  * POST /draft
  *   headers: X-App-Secret (shared secret), X-User-Id (opaque, hashed on device),
- *            optional X-Anthropic-Key (bring-your-own key: no cap, your bill)
+ *            optional X-Api-Key (bring-your-own key for the configured provider: no cap, user's bill)
  *   body: DraftRequest (see schema below)
- *   -> DraftResponse { reply, category, summary, needs_followup, language, usage }
+ *   -> { reply, category, summary, needs_followup, language, usage }
  *
- * The Anthropic key never leaves this worker. Per-user monthly counters live in KV.
+ * PROVIDER = "openai" (default) | "anthropic". API keys never leave this worker.
+ * Per-user monthly counters live in KV.
  */
+import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 
 export interface Env {
-  ANTHROPIC_API_KEY: string;
+  PROVIDER?: string;
+  OPENAI_API_KEY?: string;
+  ANTHROPIC_API_KEY?: string;
   APP_SECRET: string;
   MODEL: string;
-  FALLBACK_MODEL: string;
+  FALLBACK_MODEL?: string;
   MONTHLY_CAP: string;
   MAX_REPLY_CHARS: string;
   LIMITS: KVNamespace;
@@ -45,13 +49,30 @@ const DraftRequest = z.object({
 });
 type DraftRequest = z.infer<typeof DraftRequest>;
 
+const CATEGORIES = ["bug", "crash", "feature_request", "praise", "question", "complaint", "spam", "other"] as const;
+
 const DraftOutput = z.object({
   reply: z.string(),
-  category: z.enum(["bug", "crash", "feature_request", "praise", "question", "complaint", "spam", "other"]),
+  category: z.enum(CATEGORIES),
   summary: z.string(),
   needs_followup: z.boolean(),
   language: z.string(),
 });
+type DraftOutput = z.infer<typeof DraftOutput>;
+
+// Plain JSON Schema for OpenAI structured outputs (strict mode needs every key required, no extras).
+const OPENAI_SCHEMA = {
+  type: "object",
+  properties: {
+    reply: { type: "string", description: "The public reply to post, within the character budget" },
+    category: { type: "string", enum: [...CATEGORIES] },
+    summary: { type: "string", description: "One line for the developer's internal issue list" },
+    needs_followup: { type: "boolean", description: "True if the developer should follow up (bug, crash, unanswered question)" },
+    language: { type: "string", description: "ISO 639-1 code of the review's language" },
+  },
+  required: ["reply", "category", "summary", "needs_followup", "language"],
+  additionalProperties: false,
+} as const;
 
 const SYSTEM = `You draft public developer replies to Google Play Store reviews on behalf of an independent app developer.
 
@@ -101,10 +122,99 @@ function buildUserMessage(req: DraftRequest, maxChars: number): string {
     .join("\n");
 }
 
+class UpstreamError extends Error {
+  constructor(public status: number, public code: string, message?: string) {
+    super(message ?? code);
+  }
+}
+
+interface DraftResult {
+  out: DraftOutput;
+  model: string;
+  input_tokens: number;
+  output_tokens: number;
+  cached_tokens: number;
+}
+
+async function draftWithOpenAI(apiKey: string, model: string, user: string): Promise<DraftResult> {
+  const client = new OpenAI({ apiKey });
+  let completion: OpenAI.Chat.Completions.ChatCompletion;
+  try {
+    completion = await client.chat.completions.create({
+      model,
+      max_tokens: 600,
+      messages: [
+        { role: "system", content: SYSTEM },
+        { role: "user", content: user },
+      ],
+      response_format: { type: "json_schema", json_schema: { name: "review_reply_draft", strict: true, schema: OPENAI_SCHEMA } },
+    });
+  } catch (e) {
+    if (e instanceof OpenAI.RateLimitError) throw new UpstreamError(503, "upstream_rate_limited");
+    if (e instanceof OpenAI.AuthenticationError) throw new UpstreamError(401, "invalid_api_key");
+    if (e instanceof OpenAI.APIConnectionError) throw new UpstreamError(503, "upstream_unreachable");
+    if (e instanceof OpenAI.APIError) throw new UpstreamError(502, "upstream_error", `${e.status} ${e.message}`);
+    throw e;
+  }
+  const choice = completion.choices[0];
+  if (choice?.message?.refusal) throw new UpstreamError(422, "refused", choice.message.refusal);
+  const text = choice?.message?.content ?? "";
+  let out: DraftOutput;
+  try {
+    out = DraftOutput.parse(JSON.parse(text));
+  } catch (e) {
+    throw new UpstreamError(502, "bad_model_output", String(e));
+  }
+  return {
+    out,
+    model: completion.model,
+    input_tokens: completion.usage?.prompt_tokens ?? 0,
+    output_tokens: completion.usage?.completion_tokens ?? 0,
+    cached_tokens: completion.usage?.prompt_tokens_details?.cached_tokens ?? 0,
+  };
+}
+
+async function draftWithAnthropic(apiKey: string, model: string, fallbackModel: string | undefined, user: string): Promise<DraftResult> {
+  const client = new Anthropic({ apiKey });
+  let response: Anthropic.Beta.Messages.BetaMessage;
+  try {
+    response = await client.beta.messages.create({
+      model,
+      max_tokens: 1024,
+      ...(fallbackModel ? { betas: ["server-side-fallback-2026-06-01"], fallbacks: [{ model: fallbackModel }] } : {}),
+      output_config: { effort: "medium", format: zodOutputFormat(DraftOutput) },
+      system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
+      messages: [{ role: "user", content: user }],
+    });
+  } catch (e) {
+    if (e instanceof Anthropic.RateLimitError) throw new UpstreamError(503, "upstream_rate_limited");
+    if (e instanceof Anthropic.AuthenticationError) throw new UpstreamError(401, "invalid_api_key");
+    if (e instanceof Anthropic.APIConnectionError) throw new UpstreamError(503, "upstream_unreachable");
+    if (e instanceof Anthropic.APIError) throw new UpstreamError(502, "upstream_error", `${e.status} ${e.message}`);
+    throw e;
+  }
+  if (response.stop_reason === "refusal") throw new UpstreamError(422, "refused", response.stop_details?.explanation ?? undefined);
+  const text = response.content.find((b) => b.type === "text")?.text ?? "";
+  let out: DraftOutput;
+  try {
+    out = DraftOutput.parse(JSON.parse(text));
+  } catch (e) {
+    throw new UpstreamError(502, "bad_model_output", String(e));
+  }
+  return {
+    out,
+    model: response.model,
+    input_tokens: response.usage.input_tokens,
+    output_tokens: response.usage.output_tokens,
+    cached_tokens: response.usage.cache_read_input_tokens ?? 0,
+  };
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
-    if (request.method === "GET" && url.pathname === "/health") return json({ ok: true, model: env.MODEL });
+    const provider = (env.PROVIDER || "openai").toLowerCase();
+    if (request.method === "GET" && url.pathname === "/health") return json({ ok: true, provider, model: env.MODEL });
     if (request.method !== "POST" || url.pathname !== "/draft") return json({ error: "not found" }, 404);
 
     if (request.headers.get("x-app-secret") !== env.APP_SECRET) return json({ error: "unauthorised" }, 401);
@@ -118,7 +228,7 @@ export default {
       return json({ error: "invalid request", detail: String(e) }, 400);
     }
 
-    const byoKey = request.headers.get("x-anthropic-key") || "";
+    const byoKey = request.headers.get("x-api-key") || request.headers.get("x-anthropic-key") || "";
     const cap = Number(env.MONTHLY_CAP) || 500;
     const key = monthKey(userId);
     let used = 0;
@@ -128,36 +238,28 @@ export default {
     }
 
     const maxChars = Math.min(body.max_chars ?? (Number(env.MAX_REPLY_CHARS) || 350), 350);
-    const client = new Anthropic({ apiKey: byoKey || env.ANTHROPIC_API_KEY });
+    const user = buildUserMessage(body, maxChars);
 
-    let response: Anthropic.Beta.Messages.BetaMessage;
+    let result: DraftResult;
     try {
-      response = await client.beta.messages.create({
-        model: env.MODEL,
-        max_tokens: 1024, // deliberately short: a ≤350-char reply plus a one-line summary
-        betas: ["server-side-fallback-2026-06-01"],
-        fallbacks: [{ model: env.FALLBACK_MODEL }],
-        output_config: { effort: "medium", format: zodOutputFormat(DraftOutput) },
-        system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
-        messages: [{ role: "user", content: buildUserMessage(body, maxChars) }],
-      });
+      if (provider === "anthropic") {
+        const apiKey = byoKey || env.ANTHROPIC_API_KEY || "";
+        if (!apiKey) return json({ error: "server_key_missing" }, 500);
+        result = await draftWithAnthropic(apiKey, env.MODEL, env.FALLBACK_MODEL, user);
+      } else {
+        const apiKey = byoKey || env.OPENAI_API_KEY || "";
+        if (!apiKey) return json({ error: "server_key_missing" }, 500);
+        result = await draftWithOpenAI(apiKey, env.MODEL, user);
+      }
     } catch (e) {
-      if (e instanceof Anthropic.RateLimitError) return json({ error: "upstream_rate_limited" }, 503, { "retry-after": "10" });
-      if (e instanceof Anthropic.AuthenticationError) return json({ error: byoKey ? "invalid_anthropic_key" : "server_key_error" }, byoKey ? 400 : 500);
-      if (e instanceof Anthropic.APIConnectionError) return json({ error: "upstream_unreachable" }, 503);
-      if (e instanceof Anthropic.APIError) return json({ error: "upstream_error", status: e.status }, 502);
+      if (e instanceof UpstreamError) {
+        const status = e.code === "invalid_api_key" ? (byoKey ? 400 : 500) : e.status;
+        return json({ error: e.code, detail: e.message !== e.code ? e.message : undefined }, status, e.status === 503 ? { "retry-after": "10" } : {});
+      }
       return json({ error: "unexpected", detail: String(e) }, 500);
     }
 
-    if (response.stop_reason === "refusal") return json({ error: "refused", detail: response.stop_details?.explanation ?? null }, 422);
-
-    const text = response.content.find((b) => b.type === "text")?.text ?? "";
-    let out: z.infer<typeof DraftOutput>;
-    try {
-      out = DraftOutput.parse(JSON.parse(text));
-    } catch (e) {
-      return json({ error: "bad_model_output", detail: String(e) }, 502);
-    }
+    const out = result.out;
     if (out.reply.length > maxChars) out.reply = out.reply.slice(0, maxChars - 1).trimEnd() + "…";
 
     if (!byoKey) await env.LIMITS.put(key, String(used + 1), { expirationTtl: 60 * 60 * 24 * 40 });
@@ -167,10 +269,11 @@ export default {
       usage: {
         used: byoKey ? null : used + 1,
         cap: byoKey ? null : cap,
-        model: response.model,
-        input_tokens: response.usage.input_tokens,
-        output_tokens: response.usage.output_tokens,
-        cache_read_input_tokens: response.usage.cache_read_input_tokens ?? 0,
+        provider,
+        model: result.model,
+        input_tokens: result.input_tokens,
+        output_tokens: result.output_tokens,
+        cached_tokens: result.cached_tokens,
       },
     });
   },

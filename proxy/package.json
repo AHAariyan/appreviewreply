@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "latest",
+    "openai": "^7.15.0",
     "zod": "^4.0.0"
   },
   "devDependencies": {
