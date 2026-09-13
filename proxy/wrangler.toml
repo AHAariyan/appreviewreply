@@ -1,0 +1,21 @@
+name = "review-draft-proxy"
+main = "src/index.ts"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Secrets (set with `wrangler secret put NAME`):
+#   ANTHROPIC_API_KEY  - the studio's Anthropic key
+#   APP_SECRET         - shared secret embedded in the Android app (beta-grade; replace with Play Integrity later)
+
+[vars]
+MODEL = "claude-opus-5"
+FALLBACK_MODEL = "claude-opus-4-8"
+MONTHLY_CAP = "500"
+MAX_REPLY_CHARS = "350"
+
+# KV namespace for per-user monthly counters. Create with:
+#   wrangler kv namespace create LIMITS
+# then paste the id below.
+[[kv_namespaces]]
+binding = "LIMITS"
+id = "REPLACE_WITH_KV_ID"
