@@ -8,3 +8,5 @@
 - Google setup guide: docs/02-google-setup.md.
 - Owner to do: buy domain, GitHub repo `appreviewreply`, Cloudflare account, Anthropic key, Google Cloud project + OAuth client (needs debug SHA-1 from `./gradlew signingReport`).
 - First debug build succeeded (app-debug.apk, 22.6 MB) after lowering Gradle heap to 2 GB (16 GB Mac ran out of memory with 4 GB heap + parallel).
+- Emulator smoke test (Pixel 3a, API 33): installs, launches, sign-in screen renders, sign-in tap calls Google Authorization API without crashing (this image lacks the service; real test needs a device + OAuth client). Screenshots in assets/screenshots/.
+- Next: owner buys domain + creates GitHub repo + Cloudflare/Anthropic/Google Cloud setup (docs/02-google-setup.md); then real-device test with owner's own Play apps.
