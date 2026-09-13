@@ -8,11 +8,11 @@ Holds the Anthropic API key, drafts a Play Store review reply + classification, 
 3. `wrangler kv namespace create LIMITS` → paste the id into `wrangler.toml`.
 4. `wrangler secret put ANTHROPIC_API_KEY` (from console.anthropic.com)
    `wrangler secret put APP_SECRET` (any long random string; the Android app sends it as `X-App-Secret`)
-5. `npm run deploy` → URL like `https://review-draft-proxy.<account>.workers.dev`
+5. `npm run deploy` → URL like `https://appreviewreply-proxy.<account>.workers.dev`
 
 ## Test
 ```sh
-curl -s https://review-draft-proxy.<account>.workers.dev/draft \
+curl -s https://appreviewreply-proxy.<account>.workers.dev/draft \
   -H 'content-type: application/json' -H 'x-app-secret: ...' -H 'x-user-id: testuser0001' \
   -d '{"app":{"name":"Developer Tools","description":"JWT, JSON, Regex utilities","tone":"friendly","support_email":"support@example.com"},
        "review":{"stars":2,"text":"Crashes every time I open the JSON formatter on my Pixel 8.","app_version":"3.2.1","device":"Pixel 8"}}'

@@ -1,6 +1,6 @@
 # L0 desk check — Review-reply + ASO copilot for indie Android devs (2026-09-13)
 
-Working name: **ReviewCopilot** (rename before launch). Scorecard: 41/50 → proceed to L1.
+Product name: **AppReviewReply** — domain appreviewreply.app, package `app.appreviewreply` (decided 2026-09-13). Scorecard: 41/50 → proceed to L1.
 
 ## What Google's API allows (verified from developers.google.com)
 - Google Play Developer API `reviews` endpoints: list reviews **with comments only** from the **last 7 days** (older reviews are not retrievable → we must poll daily and keep our own history); reply via POST, **max 350 characters**, plain text.

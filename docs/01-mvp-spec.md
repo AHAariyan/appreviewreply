@@ -1,4 +1,4 @@
-# MVP spec — ReviewCopilot (Android) v0.1
+# MVP spec — AppReviewReply (Android) v0.1
 
 ## Promise
 "Reply to every Play Store review in 2 minutes a day — in your own voice — and never lose a bug report buried in a review."
