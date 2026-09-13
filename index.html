@@ -38,6 +38,8 @@
   summary { cursor:pointer; font-weight:600; }
   footer { border-top:1px solid var(--line); margin-top:40px; padding-top:16px; color:var(--ink2); font-size:14px; }
   footer a { color:var(--ink2); }
+  .shots { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin:8px 0 28px; }
+  .shots img { width:100%; border-radius:14px; border:1px solid var(--line); }
 </style>
 </head>
 <body>
@@ -65,6 +67,12 @@
       <div class="meta" style="margin-top:8px">Draft in 3 seconds · edit or tap Post</div>
     </div>
     <p class="fine" style="margin:0">Example. Replies are always reviewed by you before posting.</p>
+  </section>
+
+  <section aria-label="Screenshots" class="shots">
+    <img src="img/03-inbox.png" alt="Inbox: unanswered reviews first, tagged crash / feature request">
+    <img src="img/04-review-draft.png" alt="Review with a drafted reply, 197 of 350 characters, Post reply button">
+    <img src="img/05-issues.png" alt="Issues tab: bugs, crashes and feature requests grouped by app version">
   </section>
 
   <h2 id="how">How it works</h2>
