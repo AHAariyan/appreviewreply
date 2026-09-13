@@ -20,6 +20,7 @@ import app.appreviewreply.App
 import app.appreviewreply.MainActivity
 import app.appreviewreply.R
 import app.appreviewreply.data.auth.GoogleAuth
+import app.appreviewreply.data.demo.DemoData
 import app.appreviewreply.data.play.PlayDeveloperApi
 import java.util.concurrent.TimeUnit
 
@@ -29,7 +30,7 @@ class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
     override suspend fun doWork(): Result {
         val app = applicationContext as App
         val store = app.store
-        val apps = store.state.value.apps.filter { it.packageName != app.appreviewreply.data.demo.DemoData.PACKAGE }
+        val apps = store.state.value.apps.filter { it.packageName != DemoData.PACKAGE }
         if (apps.isEmpty()) return Result.success()
 
         val token = when (val r = GoogleAuth.authorize(applicationContext)) {

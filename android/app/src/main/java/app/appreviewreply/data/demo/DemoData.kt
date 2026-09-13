@@ -23,10 +23,14 @@ object DemoData {
     private val now = System.currentTimeMillis()
 
     val reviews: List<Review> = listOf(
-        Review("d1", PACKAGE, "Maya K.", 2, "Crashes every time I open the settings page since the last update. Pixel 8.", now - 1 * day, "en", "Pixel 8", "14", "3.2.1"),
+        Review("d1", PACKAGE, "Maya K.", 2, "Crashes every time I open the settings page since the last update. Pixel 8.", now - 1 * day, "en", "Pixel 8", "14", "3.2.1",
+            draft = "Sorry about the crash on the settings page, Maya — that's on us. We're looking into it now; if you can email support@example.com with your Pixel 8's Android version, we'll get a fix to you quickly.",
+            category = "crash", summary = "Settings page crashes on open after 3.2.1 update (Pixel 8)", needsFollowup = true),
         Review("d2", PACKAGE, "Jonas", 5, "Best notes app I've used. Sync is instant and the dark theme is perfect.", now - 1 * day, "en", "Galaxy S23", "14", "3.2.1"),
-        Review("d3", PACKAGE, "Priya R.", 3, "Good app but please add a widget for quick notes. I'd use it every day.", now - 2 * day, "en", "OnePlus 11", "13", "3.2.0"),
-        Review("d4", PACKAGE, "Tom", 1, "Lost all my notes after reinstalling. Where is the backup??", now - 2 * day, "en", "Pixel 6a", "13", "3.1.9"),
+        Review("d3", PACKAGE, "Priya R.", 3, "Good app but please add a widget for quick notes. I'd use it every day.", now - 2 * day, "en", "OnePlus 11", "13", "3.2.0",
+            category = "feature_request", summary = "Home-screen widget for quick notes"),
+        Review("d4", PACKAGE, "Tom", 1, "Lost all my notes after reinstalling. Where is the backup??", now - 2 * day, "en", "Pixel 6a", "13", "3.1.9",
+            category = "bug", summary = "Notes lost after reinstall — backup/restore unclear", needsFollowup = true),
         Review("d5", PACKAGE, "Lucía", 4, "Muy buena, pero el precio anual es alto para lo que ofrece.", now - 3 * day, "es", "Xiaomi 13", "13", "3.2.1"),
         Review("d6", PACKAGE, "Anonymous", 5, "👍", now - 3 * day, "en", null, "12", "3.2.1"),
         Review("d7", PACKAGE, "Dev W.", 2, "Ads everywhere now. Uninstalling.", now - 4 * day, "en", "Pixel 7", "14", "3.2.1"),
