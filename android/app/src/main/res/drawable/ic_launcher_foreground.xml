@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Speech bubble with a star: reply to reviews -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,30h48a8,8 0 0 1 8,8v28a8,8 0 0 1 -8,8H50l-14,12v-12h-6a8,8 0 0 1 -8,-8V38a8,8 0 0 1 8,-8z" />
+    <path
+        android:fillColor="#1F6F8B"
+        android:pathData="M54,38l4.7,9.5 10.5,1.5 -7.6,7.4 1.8,10.4L54,61.9l-9.4,4.9 1.8,-10.4 -7.6,-7.4 10.5,-1.5z" />
+</vector>

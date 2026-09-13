@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AppReviewReply</title>
+<meta name="description" content="Reply to every Google Play review in two minutes a day, in your own voice. Drafts, bug tagging and a daily inbox for indie Android developers.">
+<style>
+  :root { --ink:#1d1d1f; --ink2:#5a5f66; --line:#e3e5e8; --paper:#ffffff; --alt:#f5f6f7; --accent:#1f6f8b; --star:#d99a12; }
+  @media (prefers-color-scheme: dark) { :root { --ink:#ececec; --ink2:#b4b8bd; --line:#2f3235; --paper:#121314; --alt:#1b1d1f; --accent:#5fb0cc; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding-block:0 48px; padding-inline:20px; }
+  header, main, footer { max-width: 880px; margin: 0 auto; }
+  header { display:flex; align-items:center; justify-content:space-between; padding-block:20px; gap:12px; flex-wrap:wrap; }
+  .brand { font-weight:700; letter-spacing:.01em; text-decoration:none; color:var(--ink); }
+  .brand span { color:var(--accent); }
+  nav a { color:var(--ink2); text-decoration:none; margin-left:18px; }
+  h1 { font-size: clamp(30px, 5vw, 44px); line-height:1.12; margin: 28px 0 12px; text-wrap: balance; max-width: 22ch; }
+  .sub { font-size:19px; color:var(--ink2); max-width:56ch; margin:0 0 24px; }
+  .cta { display:inline-block; background:var(--accent); color:#fff; padding:12px 20px; border-radius:8px; text-decoration:none; font-weight:600; }
+  .cta.alt { background:transparent; color:var(--accent); border:1.5px solid var(--accent); }
+  .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  .fine { color:var(--ink2); font-size:14px; }
+  .mock { margin:36px 0; border:1px solid var(--line); border-radius:12px; background:var(--alt); padding:16px; }
+  .review { background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:12px; }
+  .stars { color:var(--star); letter-spacing:1px; }
+  .meta { color:var(--ink2); font-size:13px; }
+  .draft { border-left:3px solid var(--accent); padding:10px 12px; margin-top:10px; background:var(--alt); border-radius:6px; font-size:15px; }
+  .tag { display:inline-block; font-size:12px; padding:2px 8px; border-radius:10px; background:var(--alt); border:1px solid var(--line); margin-right:6px; }
+  .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin:24px 0; }
+  .card { border:1px solid var(--line); border-radius:12px; padding:16px; }
+  .card h3 { margin:0 0 6px; font-size:17px; }
+  .card p { margin:0; color:var(--ink2); font-size:15px; }
+  .price { border:2px solid var(--accent); border-radius:12px; padding:20px; margin:24px 0; display:flex; gap:20px; flex-wrap:wrap; align-items:center; justify-content:space-between; }
+  .price .amt { font-size:34px; font-weight:700; }
+  .price .amt small { font-size:15px; color:var(--ink2); font-weight:400; }
+  details { border-top:1px solid var(--line); padding:12px 0; }
+  summary { cursor:pointer; font-weight:600; }
+  footer { border-top:1px solid var(--line); margin-top:40px; padding-top:16px; color:var(--ink2); font-size:14px; }
+  footer a { color:var(--ink2); }
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="/">AppReview<span>Reply</span></a>
+  <nav><a href="#how">How it works</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="/privacy.html">Privacy</a></nav>
+</header>
+
+<main>
+  <h1>Reply to every Google Play review in two minutes a day.</h1>
+  <p class="sub">AppReviewReply reads your new reviews, drafts a reply in your own voice, and files the bugs and feature requests hiding in them. You read, tap Post, done. Built for independent Android developers.</p>
+  <div class="row">
+    <a class="cta" href="mailto:hello@appreviewreply.app?subject=AppReviewReply%20beta&body=I%27d%20like%20to%20join%20the%20beta.%20My%20Play%20apps%3A%20">Join the beta</a>
+    <a class="cta alt" href="#pricing">$9/month after the beta</a>
+  </div>
+  <p class="fine">Beta is free. Uses your own Google Play Console permissions. Nothing to install on a server.</p>
+
+  <section class="mock" aria-label="Example of a drafted reply">
+    <div class="review">
+      <div class="stars">★★☆☆☆</div>
+      <div class="meta">Pixel 8 · v3.2.1 · today</div>
+      <p style="margin:8px 0 0">"Crashes every time I open the JSON formatter. Was great before the update."</p>
+      <div><span class="tag">crash</span><span class="tag">v3.2.1</span><span class="tag">needs follow-up</span></div>
+      <div class="draft">Thanks for flagging this, and sorry about the crash after the update. We're looking into the JSON formatter now — if you can email support@devtools.app with your device model, we'll get a fix to you quickly.</div>
+      <div class="meta" style="margin-top:8px">Draft in 3 seconds · edit or tap Post</div>
+    </div>
+    <p class="fine" style="margin:0">Example. Replies are always reviewed by you before posting.</p>
+  </section>
+
+  <h2 id="how">How it works</h2>
+  <div class="grid">
+    <div class="card"><h3>1. Sign in with Google</h3><p>The same account you use for Play Console. Add the package names of your apps. No service accounts, no JSON keys.</p></div>
+    <div class="card"><h3>2. Open your inbox</h3><p>New reviews arrive daily with a notification. Unanswered first, 1–2 star first.</p></div>
+    <div class="card"><h3>3. Draft, edit, post</h3><p>A reply in your tone, under Google's 350-character limit, written from your example replies. One tap to post through the official API.</p></div>
+    <div class="card"><h3>4. Never lose a bug</h3><p>Reviews mentioning crashes, bugs or feature requests are tagged and collected per app version in the Issues tab.</p></div>
+  </div>
+
+  <h2 id="pricing">Pricing</h2>
+  <div class="price">
+    <div><div class="amt">$9 <small>/ month</small></div><div class="fine">or $79 / year · all your apps · 500 AI drafts a month (bring your own API key for unlimited)</div></div>
+    <a class="cta" href="mailto:hello@appreviewreply.app?subject=AppReviewReply%20beta">Join the beta — free while in beta</a>
+  </div>
+  <p class="fine">For comparison: team tools with AI replies start at $219/month.</p>
+
+  <h2 id="faq">Questions</h2>
+  <details><summary>Does it post replies automatically?</summary><p>No. Every reply is drafted, shown to you, and posted only when you tap Post. You are always the author.</p></details>
+  <details><summary>What permissions does it need?</summary><p>Your Google account's "Reply to reviews" permission in Play Console, granted through Google's standard sign-in screen. The app reads reviews with text from the last 7 days (the window Google's API provides) and keeps history on your phone.</p></details>
+  <details><summary>Where is my data stored?</summary><p>Reviews and replies stay on your device. A review's text is sent to our drafting service only when you request a draft; it is not stored there. See the <a href="/privacy.html">privacy policy</a>.</p></details>
+  <details><summary>Which platforms?</summary><p>Android app, for Google Play reviews. App Store reviews are planned.</p></details>
+</main>
+
+<footer>
+  <p>AppReviewReply is an independent product and is not affiliated with or endorsed by Google. Google Play is a trademark of Google LLC.</p>
+  <p><a href="/privacy.html">Privacy policy</a> · <a href="mailto:hello@appreviewreply.app">hello@appreviewreply.app</a></p>
+</footer>
+</body>
+</html>

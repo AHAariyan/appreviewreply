@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — AppReviewReply</title>
+<style>
+  :root { --ink:#1d1d1f; --ink2:#5a5f66; --line:#e3e5e8; --paper:#fff; --accent:#1f6f8b; }
+  @media (prefers-color-scheme: dark) { :root { --ink:#ececec; --ink2:#b4b8bd; --line:#2f3235; --paper:#121314; --accent:#5fb0cc; } }
+  body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding-block:24px 48px; padding-inline:20px; }
+  main { max-width: 760px; margin:0 auto; }
+  h1 { font-size:30px; margin:0 0 4px; } h2 { font-size:19px; margin-top:28px; }
+  .meta { color:var(--ink2); }
+  a { color:var(--accent); }
+  li { margin-bottom:6px; }
+</style>
+</head>
+<body>
+<main>
+  <p><a href="/">← AppReviewReply</a></p>
+  <h1>Privacy Policy</h1>
+  <p class="meta">Effective 13 September 2026 · Applies to the AppReviewReply Android app and appreviewreply.app</p>
+
+  <p>AppReviewReply ("the app") helps developers read and reply to their own Google Play reviews. It is operated by an independent developer (the "operator"). This policy explains what data the app accesses, how it is used, and what is stored where.</p>
+
+  <h2>1. Google account data</h2>
+  <p>The app uses Google Sign-In and asks for the <code>https://www.googleapis.com/auth/androidpublisher</code> scope. With your consent, the app uses this access to:</p>
+  <ul>
+    <li>read reviews (and your existing replies) for the app packages you add, through the Google Play Developer API;</li>
+    <li>post replies that you write or approve, on your behalf, through the same API.</li>
+  </ul>
+  <p>The app does not read or change anything else in your Play Console (no listings, releases, financial or user data). The app's use of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements.</p>
+
+  <h2>2. What is stored, and where</h2>
+  <ul>
+    <li><strong>On your device:</strong> the package names you add, the reviews fetched, your replies and drafts, your tone settings and example replies, and an anonymous random identifier. This data never leaves your device except as described in section 3.</li>
+    <li><strong>Access tokens</strong> are handled by Google Play services on your device; the operator never receives your Google password or refresh tokens.</li>
+    <li><strong>On the operator's drafting service:</strong> only a monthly counter of drafts per anonymous identifier, kept for up to 40 days. No review text, replies, names or account details are stored.</li>
+  </ul>
+
+  <h2>3. AI drafting</h2>
+  <p>When you request a draft, the app sends the review text, star rating, device/version metadata, your app's name and description, your chosen tone and example replies to the operator's drafting service, which forwards them to Anthropic's Claude API to generate a suggested reply and a category. This happens only when you tap Draft (or open a review you have not answered). The drafting service does not retain the request or the response. Anthropic processes the data under its <a href="https://www.anthropic.com/legal/commercial-terms">commercial terms</a> and does not use API data to train models. If you configure your own Anthropic API key, requests go directly under your account and the monthly counter is not used.</p>
+
+  <h2>4. Data sharing</h2>
+  <p>The operator does not sell or share personal data. Data is sent only to Google (to read and post reviews you authorise) and to the drafting service/Anthropic (to generate drafts you request). No advertising or analytics SDKs are included in the app.</p>
+
+  <h2>5. Your controls</h2>
+  <ul>
+    <li>Remove an app or uninstall AppReviewReply to delete all locally stored data.</li>
+    <li>Revoke the app's access at any time at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>.</li>
+    <li>Contact <a href="mailto:hello@appreviewreply.app">hello@appreviewreply.app</a> to ask what, if anything, is held about your anonymous identifier, or to have it deleted.</li>
+  </ul>
+
+  <h2>6. Children</h2>
+  <p>The app is intended for software developers and is not directed at children under 16.</p>
+
+  <h2>7. Changes</h2>
+  <p>Material changes will be announced in the app and on this page with a new effective date.</p>
+
+  <h2>8. Contact</h2>
+  <p>hello@appreviewreply.app</p>
+</main>
+</body>
+</html>
