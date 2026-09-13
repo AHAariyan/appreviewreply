@@ -3,7 +3,8 @@
 Holds the Anthropic API key, drafts a Play Store review reply + classification, and enforces a per-user monthly cap. Free tier is enough for the beta (100k requests/day; KV 100k reads/day).
 
 ## One-time setup (owner, ~10 min, $0)
-1. Create a Cloudflare account, install: `npm i -g wrangler` and `wrangler login`.
+0. Wrangler needs Node 22. On this Mac: `export PATH="/opt/homebrew/opt/node@22/bin:$PATH"` in the same terminal first.
+1. Create a Cloudflare account, then `npx wrangler login` (opens the browser).
 2. `cd proxy && npm install`
 3. `wrangler kv namespace create LIMITS` → paste the id into `wrangler.toml`.
 4. `wrangler secret put OPENAI_API_KEY` (or `ANTHROPIC_API_KEY` with `PROVIDER = "anthropic"` in wrangler.toml)
