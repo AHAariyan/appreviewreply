@@ -19,3 +19,5 @@
 - Secrets: OpenAI key + generated APP_SECRET stored in macOS Keychain (services appreviewreply-openai-api-key, appreviewreply-app-secret) and proxy/.dev.vars (git-ignored). Owner should rotate the key after deploy (it was pasted in chat).
 - Wrangler 4 needs Node 22; installing node@22 via Homebrew (keg-only).
 - Node 22 installed (Homebrew, keg-only). Proxy verified under wrangler dev (workerd runtime) with KV binding: feature-request review → correct reply/category. Ready for `npx wrangler deploy` once the owner logs in to Cloudflare.
+- Cloudflare: owner logged in; KV namespace created; secrets uploaded; worker deployed as appreviewreply-proxy; workers.dev subdomain "appreviewreply" registered via API. Live URL: https://appreviewreply-proxy.appreviewreply.workers.dev
+- PROXY_URL + APP_SECRET written to android/local.properties (git-ignored); beta APK/AAB rebuilt with them.

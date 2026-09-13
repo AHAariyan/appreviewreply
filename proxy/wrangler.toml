@@ -2,6 +2,7 @@ name = "appreviewreply-proxy"
 main = "src/index.ts"
 compatibility_date = "2025-09-01"
 compatibility_flags = ["nodejs_compat"]
+workers_dev = true
 
 # Secrets (set with `wrangler secret put NAME`; locally in .dev.vars):
 #   OPENAI_API_KEY     - when PROVIDER = "openai" (default)
