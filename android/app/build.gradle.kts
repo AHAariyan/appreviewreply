@@ -33,11 +33,28 @@ android {
         buildConfigField("String", "WEB_CLIENT_ID", "\"${prop("WEB_CLIENT_ID", "")}\"")
     }
 
+    // Upload key lives outside the repo: ~/.appreviewreply/keystore.properties (see docs/04-release.md)
+    val ksProps = Properties().apply {
+        val f = File(System.getProperty("user.home"), ".appreviewreply/keystore.properties")
+        if (f.exists()) f.inputStream().use { load(it) }
+    }
+    signingConfigs {
+        if (ksProps.getProperty("storeFile") != null) {
+            create("upload") {
+                storeFile = file(ksProps.getProperty("storeFile"))
+                storePassword = ksProps.getProperty("storePassword")
+                keyAlias = ksProps.getProperty("keyAlias")
+                keyPassword = ksProps.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfigs.findByName("upload")?.let { signingConfig = it }
         }
     }
 

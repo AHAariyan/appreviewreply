@@ -1,6 +1,8 @@
 package app.appreviewreply.ui
 
+import android.Manifest
 import android.app.Activity
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -58,6 +60,10 @@ fun AppNav(vm: AppViewModel = viewModel()) {
     }
     LaunchedEffect(ui.message) {
         ui.message?.let { snackbar.showSnackbar(it); vm.consumeMessage() }
+    }
+    val notifLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
+    LaunchedEffect(data.apps.isNotEmpty()) {
+        if (data.apps.isNotEmpty() && Build.VERSION.SDK_INT >= 33) notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
     val backStack by nav.currentBackStackEntryAsState()

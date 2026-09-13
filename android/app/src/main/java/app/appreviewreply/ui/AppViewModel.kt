@@ -7,6 +7,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import app.appreviewreply.App
 import app.appreviewreply.data.auth.GoogleAuth
+import app.appreviewreply.data.billing.BillingManager
+import app.appreviewreply.data.demo.DemoData
 import app.appreviewreply.data.draft.DraftClient
 import app.appreviewreply.data.model.AppState
 import app.appreviewreply.data.model.Review
@@ -30,6 +32,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val store = (application as App).store
     private val api = PlayDeveloperApi()
     private val drafts = DraftClient()
+    val billing = BillingManager(application).also { it.connect() }
 
     val data: StateFlow<AppState> = store.state
     private val _ui = MutableStateFlow(UiState())
@@ -64,6 +67,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /** Explore the app with sample reviews; no Google account needed. */
+    fun loadDemo() = viewModelScope.launch {
+        store.addApp(DemoData.app)
+        store.mergeReviews(DemoData.reviews)
+        toast("Sample app added. Drafts work; posting is simulated for the sample app.")
+    }
+
     fun addApp(packageName: String, name: String) = viewModelScope.launch {
         val pkg = packageName.trim()
         if (pkg.isEmpty()) return@launch
@@ -87,13 +97,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun removeApp(pkg: String) = viewModelScope.launch { store.removeApp(pkg) }
 
     fun sync() = viewModelScope.launch {
-        val apps = data.value.apps
+        val apps = data.value.apps.filter { it.packageName != DemoData.PACKAGE }
         if (apps.isEmpty()) return@launch
         val token = _ui.value.token ?: freshToken() ?: return@launch
         _ui.update { it.copy(syncing = true) }
         var total = 0
         var failed = 0
         for (a in apps) {
+            if (a.packageName == DemoData.PACKAGE) continue
             try { total += store.mergeReviews(api.listReviews(token, a.packageName)) } catch (_: Exception) { failed++ }
         }
         _ui.update { it.copy(syncing = false) }
@@ -125,6 +136,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun post(review: Review, text: String) = viewModelScope.launch {
         val body = text.trim().take(350)
         if (body.isEmpty()) return@launch
+        if (review.packageName == DemoData.PACKAGE) {
+            store.updateReview(review.id) { it.copy(developerReply = body, developerReplyAt = System.currentTimeMillis(), draft = null) }
+            toast("Reply saved (sample app — nothing was sent to Google)")
+            return@launch
+        }
         var token = _ui.value.token ?: freshToken() ?: run { toast("Sign in first"); return@launch }
         _ui.update { it.copy(posting = it.posting + review.id) }
         try {

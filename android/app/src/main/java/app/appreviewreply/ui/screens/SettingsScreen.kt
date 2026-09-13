@@ -50,6 +50,20 @@ fun SettingsScreen(vm: AppViewModel, onAddApp: () -> Unit) {
             OutlinedTextField(value = byo, onValueChange = { byo = it }, label = { Text("Anthropic API key (optional)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
             Row { Button(onClick = { vm.setByoKey(byo) }) { Text("Save key") }; Spacer(Modifier.padding(4.dp)); if (byo.isNotBlank()) TextButton(onClick = { byo = ""; vm.setByoKey("") }) { Text("Remove") } }
 
+            val subscribed by vm.billing.subscribed.collectAsStateWithLifecycle()
+            val offers by vm.billing.offers.collectAsStateWithLifecycle()
+            Text("Subscription", style = MaterialTheme.typography.titleMedium)
+            if (!app.appreviewreply.data.billing.BillingManager.SUBSCRIPTION_REQUIRED) {
+                Text("Free during the beta. Thank you for testing — please report anything odd.", style = MaterialTheme.typography.bodySmall)
+            } else if (subscribed) {
+                Text("Pro is active. Manage it in Google Play → Subscriptions.", style = MaterialTheme.typography.bodySmall)
+            } else {
+                val activity = androidx.compose.ui.platform.LocalContext.current as? android.app.Activity
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    offers.forEach { o -> Button(onClick = { activity?.let { vm.billing.launch(it, o.offerToken) } }) { Text("${o.basePlanId} · ${o.price}") } }
+                }
+            }
+
             Text("About", style = MaterialTheme.typography.titleMedium)
             Text("AppReviewReply ${BuildConfig.VERSION_NAME} · appreviewreply.app\nReviews are fetched with your Google account's Play Console permissions and stay on this device.", style = MaterialTheme.typography.bodySmall)
         }

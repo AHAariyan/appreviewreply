@@ -29,7 +29,7 @@ class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
     override suspend fun doWork(): Result {
         val app = applicationContext as App
         val store = app.store
-        val apps = store.state.value.apps
+        val apps = store.state.value.apps.filter { it.packageName != app.appreviewreply.data.demo.DemoData.PACKAGE }
         if (apps.isEmpty()) return Result.success()
 
         val token = when (val r = GoogleAuth.authorize(applicationContext)) {

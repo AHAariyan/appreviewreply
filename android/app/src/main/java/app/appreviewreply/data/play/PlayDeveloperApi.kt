@@ -36,9 +36,9 @@ class PlayDeveloperApi(private val client: OkHttpClient = OkHttpClient()) {
                 if (pageToken != null) append("&token=$pageToken")
             }
             val body = get(token, url)
-            val root = json.parseToJsonElement(body).jsonObject
-            root["reviews"]?.jsonArray?.forEach { el -> parseReview(packageName, el.jsonObject)?.let(out::add) }
-            pageToken = root["tokenPagination"]?.jsonObject?.get("nextPageToken")?.jsonPrimitive?.content
+            val (reviews, next) = parseReviewsPage(packageName, body)
+            out += reviews
+            pageToken = next
         } while (pageToken != null)
         out
     }
@@ -74,6 +74,14 @@ class PlayDeveloperApi(private val client: OkHttpClient = OkHttpClient()) {
         "HTTP $code"
     }
 
+    /** Parses one page of the reviews.list response. Public for unit tests. */
+    fun parseReviewsPage(packageName: String, body: String): Pair<List<Review>, String?> {
+        val root = json.parseToJsonElement(body).jsonObject
+        val reviews = root["reviews"]?.jsonArray?.mapNotNull { el -> parseReview(packageName, el.jsonObject) } ?: emptyList()
+        val next = root["tokenPagination"]?.jsonObject?.get("nextPageToken")?.jsonPrimitive?.content
+        return reviews to next
+    }
+
     private fun parseReview(packageName: String, o: JsonObject): Review? {
         val id = o["reviewId"]?.jsonPrimitive?.content ?: return null
         val author = o["authorName"]?.jsonPrimitive?.content ?: "Anonymous"
@@ -95,7 +103,7 @@ class PlayDeveloperApi(private val client: OkHttpClient = OkHttpClient()) {
             text = u.str("text")?.trim().orEmpty(),
             lastModified = u.secs("lastModified") ?: System.currentTimeMillis(),
             language = u.str("reviewerLanguage"),
-            device = u.str("deviceMetadata")?.let { null } ?: u["deviceMetadata"]?.jsonObject?.str("productName") ?: u.str("device"),
+            device = u["deviceMetadata"]?.jsonObject?.str("productName") ?: u.str("device"),
             androidVersion = u.str("androidOsVersion"),
             appVersion = u.str("appVersionName"),
             developerReply = dev?.str("text"),

@@ -47,6 +47,8 @@ fun SignInScreen(vm: AppViewModel, onDone: () -> Unit) {
         Spacer(Modifier.height(24.dp))
         if (ui.token == null) {
             Button(onClick = { vm.signIn() }, modifier = Modifier.fillMaxWidth()) { Text("Sign in with Google") }
+            Spacer(Modifier.height(8.dp))
+            OutlinedButton(onClick = { vm.loadDemo(); onDone() }, modifier = Modifier.fillMaxWidth()) { Text("Try it with sample reviews") }
         } else {
             Text("Signed in. Add the package name of an app you publish:", style = MaterialTheme.typography.bodyMedium)
             Spacer(Modifier.height(12.dp))

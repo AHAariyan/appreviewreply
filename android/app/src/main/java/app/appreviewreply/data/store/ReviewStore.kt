@@ -57,7 +57,24 @@ class ReviewStore(context: Context) {
     suspend fun mergeReviews(fetched: List<Review>): Int {
         var newUnanswered = 0
         update { s ->
-            val byId = s.reviews.associateBy { it.id }.toMutableMap()
+            val (merged, n) = mergeReviewLists(s.reviews, fetched)
+            newUnanswered = n
+            s.copy(reviews = merged, lastSync = System.currentTimeMillis())
+        }
+        return newUnanswered
+    }
+
+    suspend fun updateReview(id: String, transform: (Review) -> Review) = update { s ->
+        s.copy(reviews = s.reviews.map { if (it.id == id) transform(it) else it })
+    }
+
+    suspend fun setByoKey(key: String?) = update { it.copy(byoApiKey = key?.takeIf { k -> k.isNotBlank() }) }
+
+    companion object {
+        /** Pure merge: fetched reviews overwrite server fields, local fields survive. Returns (merged sorted list, new unanswered count). */
+        fun mergeReviewLists(existing: List<Review>, fetched: List<Review>): Pair<List<Review>, Int> {
+            var newUnanswered = 0
+            val byId = existing.associateBy { it.id }.toMutableMap()
             for (r in fetched) {
                 val old = byId[r.id]
                 if (old == null) {
@@ -70,14 +87,7 @@ class ReviewStore(context: Context) {
                     )
                 }
             }
-            s.copy(reviews = byId.values.sortedByDescending { it.lastModified }, lastSync = System.currentTimeMillis())
+            return byId.values.sortedByDescending { it.lastModified } to newUnanswered
         }
-        return newUnanswered
     }
-
-    suspend fun updateReview(id: String, transform: (Review) -> Review) = update { s ->
-        s.copy(reviews = s.reviews.map { if (it.id == id) transform(it) else it })
-    }
-
-    suspend fun setByoKey(key: String?) = update { it.copy(byoApiKey = key?.takeIf { k -> k.isNotBlank() }) }
 }

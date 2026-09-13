@@ -19,7 +19,8 @@ No domain needed for the beta. When adding the `androidpublisher` scope in step 
 - Type: **Android**
 - Package name: `app.appreviewreply`
 - SHA-1 (debug key on this Mac, valid for internal testing builds from here): `10:63:E7:8B:52:89:DD:2F:94:69:80:E4:83:6A:44:E1:E1:D8:A2:2E`
-  Later add a second Android client with the Play App Signing SHA-1 (Play Console → Setup → App signing) for store builds.
+- Create a **second** Android client for the upload key SHA-1: `9D:CD:3E:33:9C:9C:2C:9F:62:91:7A:1D:A9:DF:48:50:C1:E5:86:29` (release builds from this Mac).
+- After the first Play upload, create a **third** for the Play App Signing SHA-1 (Play Console → Setup → App signing) — that is the key store builds actually carry.
 - No client ID needs to be embedded in the app for the Authorization API; Google matches package + SHA-1.
 
 ## D. Play Console
