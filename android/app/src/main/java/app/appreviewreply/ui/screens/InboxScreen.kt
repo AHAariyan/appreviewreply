@@ -3,6 +3,8 @@ package app.appreviewreply.ui.screens
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,7 +43,7 @@ import java.util.Date
 
 enum class InboxFilter(val label: String) { UNANSWERED("Unanswered"), LOW("1–2★"), ISSUES("Issues"), ALL("All") }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun InboxScreen(vm: AppViewModel, onOpen: (String) -> Unit) {
     val data by vm.data.collectAsStateWithLifecycle()
@@ -67,9 +69,9 @@ fun InboxScreen(vm: AppViewModel, onOpen: (String) -> Unit) {
             actions = { IconButton(onClick = { vm.sync() }) { Icon(Icons.Filled.Refresh, "Sync") } },
         )
         if (ui.syncing) LinearProgressIndicator(Modifier.fillMaxWidth())
-        Row(Modifier.padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FlowRow(Modifier.padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             InboxFilter.entries.forEach { f ->
-                FilterChip(selected = filter == f, onClick = { filter = f }, label = { Text(f.label) })
+                FilterChip(selected = filter == f, onClick = { filter = f }, label = { Text(f.label, maxLines = 1) })
             }
         }
         if (data.apps.size > 1) {
@@ -101,6 +103,7 @@ fun Stars(stars: Int) {
     Text("★".repeat(stars.coerceIn(0, 5)) + "☆".repeat(5 - stars.coerceIn(0, 5)), color = MaterialTheme.colorScheme.secondary)
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ReviewCard(r: Review, appName: String?, onClick: () -> Unit) {
     Card(Modifier.fillMaxWidth().clickable(onClick = onClick)) {
@@ -115,12 +118,12 @@ fun ReviewCard(r: Review, appName: String?, onClick: () -> Unit) {
             Spacer(Modifier.height(6.dp))
             Text(r.text.ifBlank { "(no text)" }, maxLines = 3, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
             Spacer(Modifier.height(6.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 if (appName != null) AssistChip(onClick = onClick, label = { Text(appName, maxLines = 1) })
-                r.appVersion?.let { AssistChip(onClick = onClick, label = { Text("v$it") }) }
-                r.category?.let { AssistChip(onClick = onClick, label = { Text(it.replace('_', ' ')) }) }
-                if (r.answered) AssistChip(onClick = onClick, label = { Text("Answered") })
-                else if (r.draft != null) AssistChip(onClick = onClick, label = { Text("Draft ready") })
+                r.appVersion?.let { AssistChip(onClick = onClick, label = { Text("v$it", maxLines = 1) }) }
+                r.category?.let { AssistChip(onClick = onClick, label = { Text(it.replace('_', ' '), maxLines = 1) }) }
+                if (r.answered) AssistChip(onClick = onClick, label = { Text("Answered", maxLines = 1) })
+                else if (r.draft != null) AssistChip(onClick = onClick, label = { Text("Draft", maxLines = 1) })
             }
         }
     }

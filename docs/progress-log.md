@@ -13,3 +13,5 @@
 - Added: demo mode (sample reviews, simulated posting), Play Billing scaffold (SUBSCRIPTION_REQUIRED=false during beta), notification permission prompt, unit tests (API parsing, merge), release signing via ~/.appreviewreply upload key, docs 04-release + 05-play-listing, feature graphic.
 - GitHub: github.com/AHAariyan/appreviewreply (main + gh-pages site) and github.com/AHAariyan/indiestudio (private) created and pushed.
 - Not possible without owner: proxy deploy/live test (no Anthropic key on this Mac), Google Cloud OAuth client, Play Console upload, real-device end-to-end test.
+- Screenshots of all screens captured in demo mode (assets/screenshots/); chip-wrapping bug in inbox cards fixed; screenshots added to the website.
+- Deliverables ready for owner: signed app-release.aab, debug APK, website live at https://ahaariyan.github.io/appreviewreply/, listing copy, feature graphic.
