@@ -7,3 +7,4 @@
 - Site: site/index.html + privacy.html + CNAME (for GitHub Pages custom domain).
 - Google setup guide: docs/02-google-setup.md.
 - Owner to do: buy domain, GitHub repo `appreviewreply`, Cloudflare account, Anthropic key, Google Cloud project + OAuth client (needs debug SHA-1 from `./gradlew signingReport`).
+- First debug build succeeded (app-debug.apk, 22.6 MB) after lowering Gradle heap to 2 GB (16 GB Mac ran out of memory with 4 GB heap + parallel).
