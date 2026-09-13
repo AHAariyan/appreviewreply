@@ -20,7 +20,8 @@ Do these once the domain appreviewreply.app is live with index.html and privacy.
 ## C. OAuth client (Credentials → Create credentials → OAuth client ID)
 - Type: **Android**
 - Package name: `app.appreviewreply`
-- SHA-1: debug key for now → run in `android/`: `./gradlew signingReport` and copy the SHA-1 of `debug` (later add the Play App Signing SHA-1 from Play Console → Setup → App signing).
+- SHA-1 (debug key on this Mac, valid for internal testing builds from here): `10:63:E7:8B:52:89:DD:2F:94:69:80:E4:83:6A:44:E1:E1:D8:A2:2E`
+  Later add a second Android client with the Play App Signing SHA-1 (Play Console → Setup → App signing) for store builds.
 - No client ID needs to be embedded in the app for the Authorization API; Google matches package + SHA-1.
 
 ## D. Play Console
