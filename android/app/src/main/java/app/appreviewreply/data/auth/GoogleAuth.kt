@@ -1,5 +1,6 @@
 package app.appreviewreply.data.auth
 
+import android.accounts.Account
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
@@ -25,14 +26,15 @@ object GoogleAuth {
         data class Failed(val message: String) : Result()
     }
 
-    private fun request(): AuthorizationRequest =
+    private fun request(accountName: String?): AuthorizationRequest =
         AuthorizationRequest.builder()
             .setRequestedScopes(listOf(Scope(SCOPE_PUBLISHER)))
+            .apply { if (!accountName.isNullOrBlank()) setAccount(Account(accountName, "com.google")) }
             .build()
 
-    /** Silent when already granted; otherwise returns a consent intent to launch. */
-    suspend fun authorize(context: Context): Result = try {
-        val result = Identity.getAuthorizationClient(context).authorize(request()).await()
+    /** Silent when already granted; otherwise returns a consent intent to launch. Pass an account to target a specific Google account. */
+    suspend fun authorize(context: Context, accountName: String? = null): Result = try {
+        val result = Identity.getAuthorizationClient(context).authorize(request(accountName)).await()
         when {
             result.hasResolution() -> Result.NeedsConsent(result.pendingIntent!!.intentSender)
             result.accessToken != null -> Result.Token(result.accessToken!!)

@@ -58,6 +58,12 @@ fun AppNav(vm: AppViewModel = viewModel()) {
     LaunchedEffect(ui.consentIntent) {
         ui.consentIntent?.let { consentLauncher.launch(IntentSenderRequest.Builder(it).build()) }
     }
+    val accountLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) vm.onAccountPicked(result.data) else vm.accountPickerDismissed()
+    }
+    LaunchedEffect(ui.accountPickerIntent) {
+        ui.accountPickerIntent?.let { accountLauncher.launch(it) }
+    }
     LaunchedEffect(ui.message) {
         ui.message?.let { snackbar.showSnackbar(it); vm.consumeMessage() }
     }

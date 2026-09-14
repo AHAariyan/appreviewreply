@@ -70,6 +70,8 @@ class ReviewStore(context: Context) {
 
     suspend fun setByoKey(key: String?) = update { it.copy(byoApiKey = key?.takeIf { k -> k.isNotBlank() }) }
 
+    suspend fun setAccountName(name: String?) = update { it.copy(accountName = name?.takeIf { n -> n.isNotBlank() }) }
+
     companion object {
         /** Pure merge: fetched reviews overwrite server fields, local fields survive. Returns (merged sorted list, new unanswered count). */
         fun mergeReviewLists(existing: List<Review>, fetched: List<Review>): Pair<List<Review>, Int> {

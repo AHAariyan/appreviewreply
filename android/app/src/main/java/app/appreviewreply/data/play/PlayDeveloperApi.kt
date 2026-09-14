@@ -69,8 +69,13 @@ class PlayDeveloperApi(private val client: OkHttpClient = OkHttpClient()) {
     }
 
     private fun errorMessage(body: String, code: Int): String = try {
-        json.parseToJsonElement(body).jsonObject["error"]?.jsonObject?.get("message")?.jsonPrimitive?.content ?: "HTTP $code"
+        val err = json.parseToJsonElement(body).jsonObject["error"]?.jsonObject
+        val msg = err?.get("message")?.jsonPrimitive?.content
+        val status = err?.get("status")?.jsonPrimitive?.content
+        android.util.Log.w("AppReviewReply", "Play API $code: $body")
+        listOfNotNull(status, msg).joinToString(" — ").ifBlank { "HTTP $code" }
     } catch (_: Exception) {
+        android.util.Log.w("AppReviewReply", "Play API $code (unparsed): ${body.take(300)}")
         "HTTP $code"
     }
 

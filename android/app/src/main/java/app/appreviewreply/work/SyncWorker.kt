@@ -33,7 +33,7 @@ class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
         val apps = store.state.value.apps.filter { it.packageName != DemoData.PACKAGE }
         if (apps.isEmpty()) return Result.success()
 
-        val token = when (val r = GoogleAuth.authorize(applicationContext)) {
+        val token = when (val r = GoogleAuth.authorize(applicationContext, store.state.value.accountName)) {
             is GoogleAuth.Result.Token -> r.accessToken
             else -> return Result.retry()
         }

@@ -21,3 +21,7 @@
 - Node 22 installed (Homebrew, keg-only). Proxy verified under wrangler dev (workerd runtime) with KV binding: feature-request review → correct reply/category. Ready for `npx wrangler deploy` once the owner logs in to Cloudflare.
 - Cloudflare: owner logged in; KV namespace created; secrets uploaded; worker deployed as appreviewreply-proxy; workers.dev subdomain "appreviewreply" registered via API. Live URL: https://appreviewreply-proxy.appreviewreply.workers.dev
 - PROXY_URL + APP_SECRET written to android/local.properties (git-ignored); beta APK/AAB rebuilt with them.
+
+## 2026-09-14 — PAUSED by owner
+- Real-device test reached: Google sign-in OK (both accounts, after adding them as test users), token OK, Play API reachable (returned 403/404 for a package not owned by the signed-in account), account switching added. No app package was successfully added before the owner stopped.
+- Reason: dependency on Google OAuth verification and Play Console policy risk judged too high. Project kept intact; proxy still deployed (owner may delete it in Cloudflare).

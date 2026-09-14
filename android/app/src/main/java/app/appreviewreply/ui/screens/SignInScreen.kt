@@ -46,11 +46,14 @@ fun SignInScreen(vm: AppViewModel, onDone: () -> Unit) {
         )
         Spacer(Modifier.height(24.dp))
         if (ui.token == null) {
-            Button(onClick = { vm.signIn() }, modifier = Modifier.fillMaxWidth()) { Text("Sign in with Google") }
+            Button(onClick = { vm.chooseAccount() }, modifier = Modifier.fillMaxWidth()) { Text("Sign in with Google") }
+            data.accountName?.let { Spacer(Modifier.height(6.dp)); Text("Last used: $it", style = MaterialTheme.typography.bodySmall) }
             Spacer(Modifier.height(8.dp))
             OutlinedButton(onClick = { vm.loadDemo(); onDone() }, modifier = Modifier.fillMaxWidth()) { Text("Try it with sample reviews") }
         } else {
-            Text("Signed in. Add the package name of an app you publish:", style = MaterialTheme.typography.bodyMedium)
+            Text("Signed in as ${data.accountName ?: "Google account"}.", style = MaterialTheme.typography.bodyMedium)
+            androidx.compose.material3.TextButton(onClick = { vm.chooseAccount() }) { Text("Switch account") }
+            Text("Add the package name of an app you publish:", style = MaterialTheme.typography.bodyMedium)
             Spacer(Modifier.height(12.dp))
             OutlinedTextField(value = pkg, onValueChange = { pkg = it.trim() }, label = { Text("Package name, e.g. com.example.myapp") }, singleLine = true, modifier = Modifier.fillMaxWidth())
             Spacer(Modifier.height(8.dp))

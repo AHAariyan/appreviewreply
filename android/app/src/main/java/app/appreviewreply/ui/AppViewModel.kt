@@ -3,6 +3,7 @@ package app.appreviewreply.ui
 import android.app.Application
 import android.content.Intent
 import android.content.IntentSender
+import android.accounts.AccountManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import app.appreviewreply.App
@@ -22,6 +23,7 @@ import kotlinx.coroutines.launch
 data class UiState(
     val token: String? = null,
     val consentIntent: IntentSender? = null,
+    val accountPickerIntent: Intent? = null,
     val syncing: Boolean = false,
     val drafting: Set<String> = emptySet(),
     val posting: Set<String> = emptySet(),
@@ -40,8 +42,24 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     val signedIn: Boolean get() = _ui.value.token != null
 
+    /** Opens the system Google-account picker; the chosen account is remembered and used for all API calls. */
+    fun chooseAccount() {
+        val intent = AccountManager.newChooseAccountIntent(null, null, arrayOf("com.google"), null, null, null, null)
+        _ui.update { it.copy(accountPickerIntent = intent) }
+    }
+
+    fun onAccountPicked(data: Intent?) = viewModelScope.launch {
+        _ui.update { it.copy(accountPickerIntent = null) }
+        val name = data?.getStringExtra(AccountManager.KEY_ACCOUNT_NAME) ?: return@launch
+        store.setAccountName(name)
+        _ui.update { it.copy(token = null) }
+        signIn()
+    }
+
+    fun accountPickerDismissed() = _ui.update { it.copy(accountPickerIntent = null) }
+
     fun signIn() = viewModelScope.launch {
-        when (val r = GoogleAuth.authorize(getApplication())) {
+        when (val r = GoogleAuth.authorize(getApplication(), data.value.accountName)) {
             is GoogleAuth.Result.Token -> { _ui.update { it.copy(token = r.accessToken, consentIntent = null) }; sync() }
             is GoogleAuth.Result.NeedsConsent -> _ui.update { it.copy(consentIntent = r.intentSender) }
             is GoogleAuth.Result.Failed -> toast("Sign-in failed: ${r.message}")
@@ -61,7 +79,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     /** Re-authorize silently if a call returns 401. */
     private suspend fun freshToken(): String? {
-        return when (val r = GoogleAuth.authorize(getApplication())) {
+        return when (val r = GoogleAuth.authorize(getApplication(), data.value.accountName)) {
             is GoogleAuth.Result.Token -> { _ui.update { it.copy(token = r.accessToken) }; r.accessToken }
             else -> null
         }
@@ -85,7 +103,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             val n = store.mergeReviews(reviews)
             toast("Added $pkg — ${reviews.size} reviews in the last 7 days, $n unanswered")
         } catch (e: PlayDeveloperApi.ApiException) {
-            toast(if (e.code == 403 || e.code == 404) "No access to $pkg. Check the package name and your Play Console permissions." else "Error ${e.code}: ${e.message}")
+            toast("Google said (${e.code}): ${e.message}")
         } catch (e: Exception) {
             toast("Error: ${e.message}")
         } finally {

@@ -46,6 +46,7 @@ data class AppState(
     val lastSync: Long = 0,
     val userId: String? = null, // opaque id for the proxy's monthly cap
     val byoApiKey: String? = null,
+    val accountName: String? = null, // Google account used for Play Console access
 )
 
 @Serializable
